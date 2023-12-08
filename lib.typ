@@ -1,59 +1,78 @@
-// "Definitions" state which collects all the definitions
+#import "@preview/t4t:0.3.2": is
 #import "std.typ"
 
-#let defns = state("defns", std.defns_builtins)
-#let defns_counter = counter("defns_counter")
-// #let opt_strict = state("opt_strict", true)
+// "Definitions" state which collects all the user definitions
+#let user_defns = state("dirac_user_defns", ())
 
-// Insert an additional definition
-#let defn(expr) = locate(
+// Check if content is defined, either as atomic or as math.attach
+#let __check_defined(content, loc) = {
+  let user_defns_values = user_defns.final(loc).map(x => x.content)
+  return (content in user_defns_values) or (content in std.builtins_defns)
+}
+
+#let __check_is_atomic(content) = {
+  for a in std.atomic_contents {
+    if is.elem(a, content) { return true }
+  }
+  false
+}
+
+// Insert an definition. `expr` should be an equation
+#let defn(expr, custom_label: none) = locate(
   loc => {
-    // This gets the counter_val at the function call
-    let counter_val = str(defns_counter.at(loc).first())
-    // Insert expr into defns
-    defns.update(x => { x.insert("dirac_defns_" + counter_val, expr.body); x })
-    // Step our counter to prepare for the next "defn" call
-    defns_counter.step()
-    // label the expression.
-    // NOTE: label appends to the previous expression
-    // NOTE: Don't leave spaces in the markup block as it's gonna translate into user documents
-    [#expr #label("dirac_defns_" + counter_val)]
+    // User should only be allowed to define atomics or attach
+    if not (__check_is_atomic(expr.body) or is.elem(math.attach, expr.body)) {
+      panic("User definition is not atomic: " + repr(expr.body))
+    }
+    user_defns.update(
+      x => { x.push((content: expr.body, custom_label: custom_label, location: loc)); x },
+    )
+    [#expr]
   },
 )
 
-#let __check_type(content, truth) = {
-  if type(truth) == function {
-    // match directly
-    if content.func() == truth { true } else { false }
-  } else if type(truth) == str {
-    // the constructor function is private, we have to match using string
-    if repr(content.func()) == truth { true } else { false }
+// Generate link
+#let genlink(content, loc, custom_label: none) = {
+  // Step into body if content is an equation.
+  // We accept equation because otherwise writing e.g. `bold(upright(E))` is impossible outside math environment
+  if is.elem(math.equation, content) {
+    content = content.body
+  }
+
+  if __check_is_atomic(content) or is.elem(math.attach, content) {
+    // Match both custom_label and content, therefore there must only be one match at most
+    let defn_filtered = user_defns.final(loc).filter(x => (x.content == content) and (x.custom_label == custom_label))
+    if defn_filtered.len() == 1 {
+      return [#link(defn_filtered.first().location)[#content]]
+    } else {
+      panic(
+        "Multiple or no match. Link cannot be generated for label: " + repr(custom_label) + " and content: " + repr(content),
+      )
+    }
   } else {
-    panic(
-      "type_check must have truth as function or string. This is an implementation error.",
-    )
+    panic("Link can only be generated for atomic or attach")
   }
 }
 
+// Recursive equation check
 #let check(content, loc) = {
   // Check if the content is atomic (i.e. must be defined by user explicitly)
-  let is_atomic = false
-  for a in std.atomic_contents {
-    if __check_type(content, a) { is_atomic = true; break }
-  }
-
-  if is_atomic {
+  if __check_is_atomic(content) {
     // If the content is atomic, we need to check if it's already defined - either by user or in std.
-    if not (content in defns.final(loc).values()) {
+    if not __check_defined(content, loc) {
       // But before panicking check if it is a scalar (i.e. number), we don't want to define numbers
       // Use `match` as it returns `none` on no-match
-      if (content.func() == math.text) and (not (content.text.match(regex("^\d+$")) == none)) {
-        // Scalar are always given as text
-      } else {
+      // Scalar are always given as text
+      if not (
+        (content.func() == math.text) and (not (content.text.match(regex("^\d+$")) == none))
+      ) {
         panic("undefined atomic content: " + repr(content))
       }
     }
   } else {
+    // Before all, if content is an attach, check we could match the entire attach.
+    if is.elem(math.attach, content) and __check_defined(content, loc) { return }
+
     // Check if the content has subfields that is accessible to us: so we could proceed into next level
     // First determine the content type and its accessible fields
     let acc_fields = ()
@@ -61,13 +80,14 @@
 
     for a in std.accessible_fields {
       let (typ, flds) = a
-      if __check_type(content, typ) { acc_fields = flds; unknown_content = false;break }
+      if is.elem(typ, content) { acc_fields = flds; unknown_content = false; break }
     }
 
     // If the content is unknown, panic
     if unknown_content { panic("encountered unknown content " + repr(content.func())) }
     for (_, next) in content.fields().pairs().filter(x => { let (key, _) = x; key in acc_fields }) {
       if type(next) == array {
+        // This indicates we are dealing with a sequence's children
         for item in next {
           check(item, loc)
         }
@@ -80,9 +100,8 @@
 
 // Register the checker
 #let register() = locate(loc => {
-  let eqns = query(math.equation, loc)
-  eqns
-  for eqn in eqns {
+  // check eqns
+  for eqn in query(math.equation, loc) {
     check(eqn, loc)
   }
 })

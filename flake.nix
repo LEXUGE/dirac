@@ -35,12 +35,11 @@
               shellcheck.enable = true;
               shfmt.enable = true;
 
-              # FIXME: not taking effect, always pass
               typstfmt = {
                 enable = true;
                 name = "Typst Format";
                 entry = "${pkgs.typstfmt}/bin/typstfmt";
-                files = "\\.typ";
+                files = "\\.(typ)$";
               };
             };
           };
