@@ -41,7 +41,7 @@
         # nix develop
         devShells.default = pkgs.mkShell {
           inherit (self.checks.${system}.pre-commit-check) shellHook;
-          nativeBuildInputs = with pkgs; [ typst typstfmt ];
+          nativeBuildInputs = with pkgs; [ (mkWrappedTypst pkgs ./.) typstfmt ];
         };
 
         packages = {
