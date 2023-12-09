@@ -1,0 +1,9 @@
+[package]
+name = "dirac"
+version = "0.1.0"
+description = "dirac - an automated equation checker with link generation"
+authors = ["Kanyang Ying <kanyang.ying@worc.ox.ac.uk>"]
+repository = "https://github.com/LEXUGE/dirac"
+compiler = "0.9.0"
+entrypoint = "lib.typ"
+license = "MIT"

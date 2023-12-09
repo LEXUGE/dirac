@@ -3,20 +3,38 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
     utils.url = "github:numtide/flake-utils";
-    rust-overlay.url = "github:oxalica/rust-overlay";
     pre-commit-hooks = {
       url = "github:cachix/pre-commit-hooks.nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    typst2nix = {
+      url = "github:LEXUGE/typst2nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
-  outputs = { self, nixpkgs, utils, pre-commit-hooks, rust-overlay }:
+  outputs = { self, nixpkgs, utils, pre-commit-hooks, typst2nix }:
     with utils.lib;
     with nixpkgs.lib;
+    with typst2nix.helpers;
+    rec {
+      overlays.default =
+        (final: prev: {
+          typst2nix.registery = (prev.typst2nix.registery or { }) // {
+            lexuge.dirac."0.1.0" = bundleTypstPkg
+              {
+                pkgs = final;
+                path = ./.;
+                namespace = "lexuge";
+              };
+          };
+        }
+        );
+    } //
     eachSystem defaultSystems (system:
       let
         pkgs = import nixpkgs {
           inherit system;
-          overlays = [ rust-overlay.overlays.default ];
+          overlays = [ self.overlays.default typst2nix.overlays.default ];
         };
       in
       rec {
@@ -24,6 +42,16 @@
         devShells.default = pkgs.mkShell {
           inherit (self.checks.${system}.pre-commit-check) shellHook;
           nativeBuildInputs = with pkgs; [ typst typstfmt ];
+        };
+
+        packages = {
+          dirac-guide = (buildTypst rec {
+            inherit pkgs;
+            src = ./.;
+            path = "./manual.typ";
+            version = "git";
+            pname = "dirac-guide";
+          });
         };
 
         checks = {
@@ -43,6 +71,6 @@
               };
             };
           };
-        };
+        } // packages;
       });
 }

@@ -18,41 +18,50 @@
 }
 
 // Insert an definition. `expr` should be an equation
-#let defn(expr, custom_label: none) = locate(
+#let defn(expr, custom_label: none, visible: true) = locate(
   loc => {
-    // User should only be allowed to define atomics or attach
-    if not (__check_is_atomic(expr.body) or is.elem(math.attach, expr.body)) {
-      panic("User definition is not atomic: " + repr(expr.body))
+    // Unwrap our expr (mainly needed to deal with e.g. dirac)
+    if is.elem(math.equation, expr) {
+      defn(expr.body, custom_label: custom_label, visible: visible)
+    } else {
+      // User should only be allowed to define atomics or attach
+      if not (__check_is_atomic(expr) or is.elem(math.attach, expr)) {
+        panic("User definition is not atomic: " + repr(expr))
+      }
+      user_defns.update(
+        x => { x.push((content: expr, custom_label: custom_label, location: loc)); x },
+      )
+      if visible {
+        [#expr]
+      }
     }
-    user_defns.update(
-      x => { x.push((content: expr.body, custom_label: custom_label, location: loc)); x },
-    )
-    [#expr]
   },
 )
 
 // Generate link
-#let genlink(content, loc, custom_label: none) = {
-  // Step into body if content is an equation.
-  // We accept equation because otherwise writing e.g. `bold(upright(E))` is impossible outside math environment
-  if is.elem(math.equation, content) {
-    content = content.body
-  }
-
-  if __check_is_atomic(content) or is.elem(math.attach, content) {
-    // Match both custom_label and content, therefore there must only be one match at most
-    let defn_filtered = user_defns.final(loc).filter(x => (x.content == content) and (x.custom_label == custom_label))
-    if defn_filtered.len() == 1 {
-      return [#link(defn_filtered.first().location)[#content]]
+#let genlink(content, custom_label: none) = locate(
+  loc => {
+    // Step into body if content is an equation.
+    // We accept equation because otherwise writing e.g. `bold(upright(E))` is impossible outside math environment
+    if is.elem(math.equation, content) {
+      genlink(content.body, custom_label: custom_label)
     } else {
-      panic(
-        "Multiple or no match. Link cannot be generated for label: " + repr(custom_label) + " and content: " + repr(content),
-      )
+      if __check_is_atomic(content) or is.elem(math.attach, content) {
+        // Match both custom_label and content, therefore there must only be one match at most
+        let defn_filtered = user_defns.final(loc).filter(x => (x.content == content) and (x.custom_label == custom_label))
+        if defn_filtered.len() == 1 {
+          return [#link(defn_filtered.first().location)[#content]]
+        } else {
+          panic(
+            "Multiple or no match. Link cannot be generated for label: " + repr(custom_label) + " and content: " + repr(content),
+          )
+        }
+      } else {
+        panic("Link can only be generated for atomic or attach")
+      }
     }
-  } else {
-    panic("Link can only be generated for atomic or attach")
-  }
-}
+  },
+)
 
 // Recursive equation check
 #let check(content, loc) = {

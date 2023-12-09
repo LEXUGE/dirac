@@ -4,6 +4,7 @@
   // math.text(...) notation works, good!
   math.text(math.plus),
   math.text(math.minus),
+  math.text(math.times),
   math.text(math.sum),
   math.text(math.eq),
   math.text(math.colon.eq),
