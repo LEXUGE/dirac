@@ -63,9 +63,10 @@
               shellcheck.enable = true;
               shfmt.enable = true;
 
-              typstfmt = {
+              typstfmt = mkForce {
                 enable = true;
                 name = "Typst Format";
+                # Official registery has wrong executable path.
                 entry = "${pkgs.typstfmt}/bin/typstfmt";
                 files = "\\.(typ)$";
               };

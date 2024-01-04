@@ -113,11 +113,11 @@
     },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1701861573,
-        "narHash": "sha256-9mZL4N+G/iAADDdR6vKDFwiweYLO8hAmjnDHvfVhYCY=",
+        "lastModified": 1704161960,
+        "narHash": "sha256-QGua89Pmq+FBAro8NriTuoO/wNaUtugt29/qqA8zeeM=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "325eb628b89b9a8183256f62d017bfb499b19bd9",
+        "rev": "63143ac2c9186be6d9da6035fa22620018c85932",
         "type": "github"
       },
       "original": {
@@ -162,11 +162,11 @@
     "official-packages": {
       "flake": false,
       "locked": {
-        "lastModified": 1701949042,
-        "narHash": "sha256-9k+7z8yAPTHcmIKbbDWdFMK0kXXFI67aJXEFV7vZG00=",
+        "lastModified": 1704289676,
+        "narHash": "sha256-XSIMxPlyjXTetNvAiZq3Cdqhac++WMjc7DoJybNuofM=",
         "owner": "typst",
         "repo": "packages",
-        "rev": "c0cf9fcbf9c0626e5c0f385889e528c49784de86",
+        "rev": "78a618a0a6f46103fcaa2673c8af3963f9d1d4e5",
         "type": "github"
       },
       "original": {
@@ -186,11 +186,11 @@
         "nixpkgs-stable": "nixpkgs-stable"
       },
       "locked": {
-        "lastModified": 1700922917,
-        "narHash": "sha256-ej2fch/T584b5K9sk1UhmZF7W6wEfDHuoUYpFN8dtvM=",
+        "lastModified": 1703939133,
+        "narHash": "sha256-Gxe+mfOT6bL7wLC/tuT2F+V+Sb44jNr8YsJ3cyIl4Mo=",
         "owner": "cachix",
         "repo": "pre-commit-hooks.nix",
-        "rev": "e5ee5c5f3844550c01d2131096c7271cec5e9b78",
+        "rev": "9d3d7e18c6bc4473d7520200d4ddab12f8402d38",
         "type": "github"
       },
       "original": {
@@ -211,11 +211,11 @@
         "nixpkgs-stable": "nixpkgs-stable_2"
       },
       "locked": {
-        "lastModified": 1700922917,
-        "narHash": "sha256-ej2fch/T584b5K9sk1UhmZF7W6wEfDHuoUYpFN8dtvM=",
+        "lastModified": 1703939133,
+        "narHash": "sha256-Gxe+mfOT6bL7wLC/tuT2F+V+Sb44jNr8YsJ3cyIl4Mo=",
         "owner": "cachix",
         "repo": "pre-commit-hooks.nix",
-        "rev": "e5ee5c5f3844550c01d2131096c7271cec5e9b78",
+        "rev": "9d3d7e18c6bc4473d7520200d4ddab12f8402d38",
         "type": "github"
       },
       "original": {
@@ -295,11 +295,11 @@
     "typst-ts-mode": {
       "flake": false,
       "locked": {
-        "lastModified": 1701853682,
-        "narHash": "sha256-okrkMrcEH1CdCs5uOYdxiOSJ5br3jPLw8cVExL+3jkA=",
+        "lastModified": 1703993655,
+        "narHash": "sha256-H4KnRkAhjZizITL7w+dmzEtZIDA/L101acdg/mjDp3c=",
         "ref": "refs/heads/main",
-        "rev": "361dfe6001d5299547219a63381d70433877b926",
-        "revCount": 33,
+        "rev": "70bcc7814bd245c6b35c20d136858ee3672cffa0",
+        "revCount": 56,
         "type": "git",
         "url": "https://git.sr.ht/~meow_king/typst-ts-mode"
       },
@@ -319,11 +319,11 @@
         "utils": "utils"
       },
       "locked": {
-        "lastModified": 1702140866,
-        "narHash": "sha256-+vqo20KE3CCTInq51bGv92plXak+BgCAJWI9xEnlDHw=",
+        "lastModified": 1704357331,
+        "narHash": "sha256-wWkCHINbAngcioki1lvH8ANN9NsvzYMxZFZY+I09dso=",
         "owner": "LEXUGE",
         "repo": "typst2nix",
-        "rev": "e8aedafcfb8886065aea16be2d912cffbdc3f96a",
+        "rev": "1b6cb5f54f187c4da29c7b58be113e163b29851e",
         "type": "github"
       },
       "original": {
